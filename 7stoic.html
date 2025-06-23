@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7stoic - Blackout Motivation</title>
+    <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect x="4" y="4" width="56" height="56" fill="none" stroke="white" stroke-width="4" filter="url(%23glow)"/><text x="32" y="44" text-anchor="middle" font-family="Arial" font-size="32" font-weight="bold" fill="white" filter="url(%23glow)">7s</text><defs><filter id="glow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="black"/></filter></defs></svg>'>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .container {
+            max-width: 1000px;
+            width: 100%;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+        }
+        .header p {
+            font-size: 1.1rem;
+            color: #ccc;
+            font-style: italic;
+        }
+        .quote-card {
+            background: #111;
+            border-radius: 0;
+            padding: 3rem 2rem;
+            margin-bottom: 2rem;
+            border: 2px solid #fff;
+            text-align: center;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .quote-text {
+            font-size: 2rem;
+            font-weight: 400;
+            color: #fff;
+            line-height: 1.5;
+            margin-bottom: 0;
+            text-shadow: none;
+        }
+        .btn {
+            background: #fff;
+            color: #111;
+            border-radius: 0;
+            border: 2px solid #fff;
+            font-size: 1.1rem;
+            padding: 0.75rem 2.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 0 0.5rem;
+        }
+        .btn:hover {
+            background: #222;
+            color: #fff;
+        }
+        .saved-section {
+            background: #111;
+            color: #fff;
+            border: 2px solid #fff;
+            border-radius: 0;
+            margin-top: 2rem;
+            padding: 1.5rem 2rem;
+        }
+        .saved-section h2 {
+            font-size: 1.2rem;
+            color: #fff;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .saved-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .saved-item {
+            background: #222;
+            color: #fff;
+            border: 1px solid #fff;
+            border-radius: 0;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            .quote-card {
+                padding: 2rem;
+            }
+            .quote-text {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>7stoic</h1>
+            <p style="font-style: normal;">Reminders for the subconscious</p>
+            <p>----------------------------------------------------------</p>
+            <p style="font-style: normal;">&copy; 2025 Himali M Suresh. All rights reserved.</p>
+        </div>
+        <!-- Quote Card -->
+        <div class="quote-card" id="quoteCard">
+            <div class="quote-text" id="quoteText">Click "New Quote" to get started!</div>
+        </div>
+        <!-- New Quote, Save, Share Buttons -->
+        <div style="display: flex; justify-content: center; margin-bottom: 2rem;">
+            <button class="btn" id="newQuoteBtn">New Quote</button>
+            <button class="btn" id="saveBtn">Save</button>
+            <button class="btn" id="shareBtn">Share</button>
+        </div>
+        <!-- Saved Quotes Section -->
+        <div class="saved-section" id="savedSection" style="display:none;">
+            <h2>Saved Quotes</h2>
+            <ul class="saved-list" id="savedList"></ul>
+        </div>
+    </div>
+
+    <script>
+        // stoic one-liner quotes
+        const quotes = [
+            "Endure what you must, let go what you cannot control.",
+            "The obstacle is the way.",
+            "Persist, adapt, accept.",
+            "You have power over your mind, not outside events.",
+            "Let your actions speak, not your words.",
+            "Focus on what you can change.",
+            "Be present. Be disciplined. Be calm.",
+            "Choose courage over comfort.",
+            "Simplicity is strength.",
+            "Respond, don't react.",
+            "Progress, not perfection.",
+            "Let reason guide you, not passion.",
+            "Adversity reveals character.",
+            "Detach from outcome, embrace the process.",
+            "Live with intention, not impulse."
+        ];
+
+        const quoteCard = document.getElementById('quoteCard');
+        const quoteText = document.getElementById('quoteText');
+        const newQuoteBtn = document.getElementById('newQuoteBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const shareBtn = document.getElementById('shareBtn');
+        const savedSection = document.getElementById('savedSection');
+        const savedList = document.getElementById('savedList');
+        function generateRandomQuote() {
+            const randomIndex = Math.floor(Math.random() * quotes.length);
+            quoteText.textContent = quotes[randomIndex];
+        }
+        newQuoteBtn.addEventListener('click', generateRandomQuote);
+        // Save quote to localStorage
+        function getSavedQuotes() {
+            return JSON.parse(localStorage.getItem('stoicSavedQuotes') || '[]');
+        }
+        function setSavedQuotes(arr) {
+            localStorage.setItem('stoicSavedQuotes', JSON.stringify(arr));
+        }
+        function renderSavedQuotes() {
+            const saved = getSavedQuotes();
+            if (saved.length === 0) {
+                savedSection.style.display = 'none';
+                return;
+            }
+            savedSection.style.display = 'block';
+            savedList.innerHTML = saved.map(q => `<li class="saved-item">${q}</li>`).join('');
+        }
+        saveBtn.addEventListener('click', () => {
+            const current = quoteText.textContent.trim();
+            if (!current) return;
+            let saved = getSavedQuotes();
+            if (!saved.includes(current)) {
+                saved.push(current);
+                setSavedQuotes(saved);
+                renderSavedQuotes();
+            }
+        });
+        // share quote
+        shareBtn.addEventListener('click', async () => {
+            const current = quoteText.textContent.trim();
+            if (!current) return;
+            if (navigator.share) {
+                try {
+                    await navigator.share({ text: current });
+                } catch (e) {}
+            } else if (navigator.clipboard) {
+                try {
+                    await navigator.clipboard.writeText(current);
+                    shareBtn.textContent = 'Copied!';
+                    setTimeout(() => { shareBtn.textContent = 'Share'; }, 1500);
+                } catch (e) {}
+            }
+        });
+        // sender saved quotes on load
+        renderSavedQuotes();
+        // show a quote on load
+        generateRandomQuote();
+    </script>
+</body>
+</html>
