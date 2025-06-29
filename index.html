@@ -268,7 +268,7 @@
             // Show loading state
             newQuoteBtn.classList.add('loading');
             newQuoteBtn.textContent = 'Loading...';
-            quoteText.textContent = 'Fetching wisdom...';
+            quoteText.textContent = 'Fetching quote...';
             
             try {
                 const quote = await fetchQuoteFromAPI(currentCategory);
