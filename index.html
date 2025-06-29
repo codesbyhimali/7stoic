@@ -76,6 +76,14 @@
             background: #222;
             color: #fff;
         }
+        .category-btn.active {
+            background: #222;
+            color: #fff;
+        }
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
         .saved-section {
             background: #111;
             color: #fff;
@@ -103,6 +111,34 @@
             padding: 0.75rem 1rem;
             margin-bottom: 0.5rem;
             font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .delete-btn {
+            background: #fff;
+            color: #111;
+            border: 1px solid #fff;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
+        .delete-btn:hover {
+            background: #ff4444;
+            color: #fff;
+            border-color: #ff4444;
+        }
+        .quote-content {
+            flex: 1;
+            margin-right: 10px;
         }
         @media (max-width: 768px) {
             .header h1 {
@@ -128,24 +164,44 @@
         </div>
         <!-- Quote Card -->
         <div class="quote-card" id="quoteCard">
-            <div class="quote-text" id="quoteText">Click "New Quote" to get started!</div>
+            <div class="quote-text" id="quoteText">Click "Random Quote" to get started!</div>
         </div>
-        <!-- New Quote, Save, Share Buttons -->
+        <!-- Category Selection -->
+        <div style="display: flex; justify-content: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+            <button class="btn category-btn" data-type="motivational">Motivational</button>
+            <button class="btn category-btn" data-type="wisdom">Wisdom</button>
+            <button class="btn category-btn" data-type="happy">Happy</button>
+            <button class="btn category-btn" data-type="love">Love</button>
+            <button class="btn category-btn" data-type="sad">Sad</button>
+        </div>
+        <!-- Random Quote, Save, Share Buttons -->
         <div style="display: flex; justify-content: center; margin-bottom: 2rem;">
-            <button class="btn" id="newQuoteBtn">New Quote</button>
+            <button class="btn category-btn" id="newQuoteBtn">Random Quote</button>
             <button class="btn" id="saveBtn">Save</button>
             <button class="btn" id="shareBtn">Share</button>
         </div>
         <!-- Saved Quotes Section -->
         <div class="saved-section" id="savedSection" style="display:none;">
-            <h2>Saved Quotes</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2>Saved Quotes</h2>
+                <button class="btn" id="clearAllBtn" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Clear All</button>
+            </div>
             <ul class="saved-list" id="savedList"></ul>
         </div>
     </div>
 
     <script>
-        // stoic one-liner quotes
-        const quotes = [
+        // Configuration
+        const config = {
+            endpoint: atob('aHR0cHM6Ly9xdW90ZWFwaS1nYW1tYS52ZXJjZWwuYXBw'),
+            paths: {
+                quotes: '/api',
+                types: '/types'
+            }
+        };
+        
+        // Fallback quotes in case API fails
+        const fallbackQuotes = [
             "Endure what you must, let go what you cannot control.",
             "The obstacle is the way.",
             "Persist, adapt, accept.",
@@ -163,6 +219,7 @@
             "Live with intention, not impulse."
         ];
 
+        // DOM Elements
         const quoteCard = document.getElementById('quoteCard');
         const quoteText = document.getElementById('quoteText');
         const newQuoteBtn = document.getElementById('newQuoteBtn');
@@ -170,10 +227,83 @@
         const shareBtn = document.getElementById('shareBtn');
         const savedSection = document.getElementById('savedSection');
         const savedList = document.getElementById('savedList');
-        function generateRandomQuote() {
-            const randomIndex = Math.floor(Math.random() * quotes.length);
-            quoteText.textContent = quotes[randomIndex];
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        
+        // Current selected category
+        let currentCategory = '';
+        
+        // Fetch quote from API
+        async function fetchQuoteFromAPI(category = '') {
+            try {
+                const baseUrl = config.endpoint + config.paths.quotes;
+                const url = category ? `${baseUrl}?type=${category}` : baseUrl;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Extract quote text and author from the nested structure
+                if (data.quote && data.quote.text) {
+                    const quoteText = data.quote.text;
+                    const author = data.quote.author;
+                    return author ? `${quoteText} — ${author}` : quoteText;
+                } else {
+                    // Fallback for different response formats
+                    return data.text || data.message || 'No quote available';
+                }
+            } catch (error) {
+                console.error('API fetch failed:', error);
+                // Return fallback quote
+                const randomIndex = Math.floor(Math.random() * fallbackQuotes.length);
+                return fallbackQuotes[randomIndex];
+            }
         }
+        
+        // Generate random quote
+        async function generateRandomQuote() {
+            // Show loading state
+            newQuoteBtn.classList.add('loading');
+            newQuoteBtn.textContent = 'Loading...';
+            quoteText.textContent = 'Fetching wisdom...';
+            
+            try {
+                const quote = await fetchQuoteFromAPI(currentCategory);
+                quoteText.textContent = quote;
+            } catch (error) {
+                console.error('Error generating quote:', error);
+                quoteText.textContent = 'Failed to load quote. Please try again.';
+            } finally {
+                // Remove loading state
+                newQuoteBtn.classList.remove('loading');
+                newQuoteBtn.textContent = 'Random Quote';
+            }
+        }
+        
+        // Category selection
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update active state
+                categoryBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Update current category
+                currentCategory = btn.dataset.type;
+                
+                // Generate new quote with selected category
+                generateRandomQuote();
+            });
+        });
+        
+        // Set default active category (All Categories)
+        if (categoryBtns.length > 0) {
+            categoryBtns[0].classList.add('active');
+            currentCategory = categoryBtns[0].dataset.type; // Empty string for "All Categories"
+        }
+        
         newQuoteBtn.addEventListener('click', generateRandomQuote);
         // Save quote to localStorage
         function getSavedQuotes() {
@@ -189,7 +319,19 @@
                 return;
             }
             savedSection.style.display = 'block';
-            savedList.innerHTML = saved.map(q => `<li class="saved-item">${q}</li>`).join('');
+            savedList.innerHTML = saved.map((q, index) => `
+                <li class="saved-item">
+                    <span class="quote-content">${q}</span>
+                    <button class="delete-btn" onclick="removeSavedQuote(${index})" title="Delete quote">×</button>
+                </li>
+            `).join('');
+        }
+        
+        function removeSavedQuote(index) {
+            let saved = getSavedQuotes();
+            saved.splice(index, 1);
+            setSavedQuotes(saved);
+            renderSavedQuotes();
         }
         saveBtn.addEventListener('click', () => {
             const current = quoteText.textContent.trim();
@@ -217,6 +359,15 @@
                 } catch (e) {}
             }
         });
+        
+        // Clear all saved quotes
+        clearAllBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to delete all saved quotes?')) {
+                setSavedQuotes([]);
+                renderSavedQuotes();
+            }
+        });
+        
         // sender saved quotes on load
         renderSavedQuotes();
         // show a quote on load
