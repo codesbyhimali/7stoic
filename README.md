@@ -3,7 +3,7 @@
 A minimalist, blackout-themed quote generator that serves powerful reminders to the subconscious. Built with HTML, CSS, and JavaScript, it fetches stoic-style motivational quotes from an external API having fallback quotes for offline resilience. Users can explore by mood, save favorites, and share them seamlessly.
 
 ## Live Demo
-[View 7stoic in your browser](#) <!-- Replace with GitHub Pages or other live link if hosted -->
+[https://https://codesbyhimali.github.io/7stoic/](#) <!-- Replace with GitHub Pages or other live link if hosted -->
 
 ## Features
 
