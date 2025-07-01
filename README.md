@@ -1,6 +1,6 @@
 # 7stoic - Blackout Motivation
 
-A minimalist, blackout-themed quote generator that serves powerful reminders to the subconscious. Built with HTML, CSS, and JavaScript, it fetches stoic-style motivational quotes from an external API—with fallback quotes for offline resilience. Users can explore by mood, save favorites, and share them seamlessly.
+A minimalist, blackout-themed quote generator that serves powerful reminders to the subconscious. Built with HTML, CSS, and JavaScript, it fetches stoic-style motivational quotes from an external API having fallback quotes for offline resilience. Users can explore by mood, save favorites, and share them seamlessly.
 
 ## Live Demo
 [View 7stoic in your browser](#) <!-- Replace with GitHub Pages or other live link if hosted -->
