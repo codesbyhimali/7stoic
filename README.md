@@ -72,4 +72,4 @@ Let’s keep 7stoic calm, clean, and effective.
 ## Acknowledgments
 
 - Inspired by Stoicism, Calm Design, and Personal Reflection
-- Uses [VerceI Gama's Quote API](https://quoteapi-gamma.vercel.app/) (Base64 encoded for clarity)
+- Uses [VerceI Gama's Quote API](https://quotify.dazzelr.tech)
