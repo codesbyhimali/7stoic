@@ -192,13 +192,21 @@
 
     <script>
         // Configuration
+        // API key will be injected from GitHub environment variable during build/deployment
         const config = {
             endpoint: 'https://quotify.dazzelr.tech',
+            apiKey: 'GITHUB_API_KEY', // This will be replaced by GitHub Actions with ${{ secrets.QUOTIFY_API_KEY }}
             paths: {
                 quotes: '/api',
                 types: '/api/types'
             }
         };
+        
+        // Get API key (placeholder for GitHub variable injection)
+        function getApiKey() {
+            // In production, this will be replaced with the actual GitHub secret
+            return config.apiKey === 'GITHUB_API_KEY' ? null : config.apiKey;
+        }
         
         // Fallback quotes in case API fails
         const fallbackQuotes = [
@@ -236,9 +244,18 @@
         // Fetch quote from API
         async function fetchQuoteFromAPI(category = '') {
             try {
+                const apiKey = getApiKey();
+                if (!apiKey) {
+                    throw new Error('API key not configured');
+                }
+                
                 const baseUrl = config.endpoint + config.paths.quotes;
                 const url = category ? `${baseUrl}?type=${category}` : baseUrl;
-                const response = await fetch(url);
+                const response = await fetch(url, {
+                    headers: {
+                        'x-api-key': apiKey
+                    }
+                });
                 
                 if (!response.ok) {
                     throw new Error(`API Error: ${response.status}`);
