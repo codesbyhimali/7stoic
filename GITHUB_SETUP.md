@@ -8,7 +8,7 @@
 2. Click on **Settings** → **Secrets and variables** → **Actions**
 3. Click **New repository secret**
 4. Name: `QUOTIFY_API_KEY`
-5. Value: Your API key (`qapi_8ff2baa56316ce39537f95d8941b06c90e75748a99d098a817cc93f80b731f20`)
+5. Value: Your API key (`qapi_`)
 6. Click **Add secret**
 
 ### Step 2: GitHub Actions Workflow
